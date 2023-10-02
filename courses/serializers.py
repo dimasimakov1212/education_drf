@@ -7,10 +7,20 @@ class CourseSerializer(serializers.ModelSerializer):
     """
     Класс сериализатора для модели Course
     """
+    # определяем дополнительное поле в модели Course
+    lessons_count = serializers.SerializerMethodField()  # данные о количестве уроков в курсе
+
     class Meta:
         model = Course
         # fields = ('course_title', 'course_description',)
         fields = '__all__'
+
+    def get_lessons_count(self, instance):
+        """
+        Метод определения поля lessons_count
+        :return: количество уроков курса
+        """
+        return instance.lesson.all().count()
 
 
 class LessonSerializer(serializers.ModelSerializer):
