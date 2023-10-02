@@ -18,3 +18,11 @@ class PaymentCreateAPIView(generics.CreateAPIView):
     класс для создания платежа на основе generics
     """
     serializer_class = PaymentSerializer
+
+
+class PaymentUpdateAPIView(generics.UpdateAPIView):
+    """
+    класс для изменения оплаты на основе generics
+    """
+    serializer_class = PaymentSerializer
+    queryset = Payment.objects.all()
