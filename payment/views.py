@@ -26,3 +26,18 @@ class PaymentUpdateAPIView(generics.UpdateAPIView):
     """
     serializer_class = PaymentSerializer
     queryset = Payment.objects.all()
+
+
+class PaymentRetrieveAPIView(generics.RetrieveAPIView):
+    """
+    класс для вывода одного платежа на основе generics
+    """
+    serializer_class = PaymentSerializer
+    queryset = Payment.objects.all()
+
+
+class PaymentDestroyAPIView(generics.DestroyAPIView):
+    """
+    класс для удаления одного мото на основе generics
+    """
+    queryset = Payment.objects.all()
