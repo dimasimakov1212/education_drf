@@ -16,7 +16,7 @@ class Payment(models.Model):
         (PAYMENT_CASH, 'наличная')
     )
 
-    payment_date = models.DateField(auto_now_add=True, verbose_name='Дата оплаты')
+    payment_date = models.DateField(verbose_name='Дата оплаты')
     payment_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Сумма оплаты')
     payment_type = models.CharField(max_length=20, choices=PAYMENT_CHOICES, verbose_name='тип оплаты')
 

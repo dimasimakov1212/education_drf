@@ -11,3 +11,10 @@ class PaymentListAPIView(generics.ListAPIView):
     """
     serializer_class = PaymentSerializer
     queryset = Payment.objects.all()
+
+
+class PaymentCreateAPIView(generics.CreateAPIView):
+    """
+    класс для создания платежа на основе generics
+    """
+    serializer_class = PaymentSerializer
