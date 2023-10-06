@@ -3,8 +3,9 @@ from rest_framework import viewsets, generics
 from rest_framework.permissions import IsAuthenticated
 
 from courses.models import Course, Lesson
-from courses.permissions import IsMember, IsModerator, IsOwner
+from courses.permissions import IsMember, IsModerator, IsOwner, CoursePermission
 from courses.serializers import CourseSerializer, LessonSerializer
+from users.models import UserRoles
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -14,7 +15,19 @@ class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
 
-    permission_classes = [IsAuthenticated]  # доступно только авторизованным пользователям
+    # доступно только авторизованным пользователям и с определенными правами
+    permission_classes = [IsAuthenticated, CoursePermission]
+
+    def get_queryset(self):
+        """
+        Определяем параметры вывода объектов
+        :return:
+        """
+        if self.request.user.user_role == UserRoles.MODERATOR:
+            return Course.objects.all()
+
+        else:
+            return Course.objects.filter(owner=self.request.user)
 
     def perform_create(self, serializer):
         """
