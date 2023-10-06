@@ -10,6 +10,9 @@ class Course(models.Model):
     course_description = models.TextField(verbose_name='описание')
     course_avatar = models.ImageField(upload_to='media/', verbose_name='аватар', blank=True, null=True)
 
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='владелец',
+                              blank=True, null=True)
+
     def __str__(self):
         # Строковое отображение объекта
         return f'{self.course_title}'
@@ -31,6 +34,9 @@ class Lesson(models.Model):
 
     course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name='курс', blank=True, null=True,
                                related_name='lesson')
+
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='владелец',
+                              blank=True, null=True)
 
     def __str__(self):
         # Строковое отображение объекта

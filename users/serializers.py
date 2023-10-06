@@ -12,8 +12,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        # fields = '__all__'
-        fields = ('user_email', 'user_phone', 'user_avatar', 'user_city', 'is_active', 'payments')
+        fields = '__all__'
+        # fields = ('user_email', 'user_phone', 'user_avatar', 'user_city', 'is_active', 'payments')
 
     def get_payments(self, user):
         """
