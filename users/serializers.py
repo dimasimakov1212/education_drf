@@ -30,3 +30,13 @@ class UserSerializer(serializers.ModelSerializer):
             payments.append(pay)  # добавляем каждый платеж в общий список
 
         return payments
+
+
+class AnyUserSerializer(serializers.ModelSerializer):
+    """
+    Класс сериализатора для модели User при использовании стронним пользователем
+    """
+
+    class Meta:
+        model = User
+        fields = ('id', 'user_email', 'user_city')
