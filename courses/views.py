@@ -3,6 +3,7 @@ from rest_framework import viewsets, generics
 from rest_framework.permissions import IsAuthenticated
 
 from courses.models import Course, Lesson, Subscription
+from courses.paginators import CourseLessonPaginator
 from courses.permissions import IsMember, IsModerator, IsOwner, CoursePermission
 from courses.serializers import CourseSerializer, LessonSerializer, SubscriptionSerializer
 from users.models import UserRoles
@@ -17,6 +18,8 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     # доступно только авторизованным пользователям и с определенными правами
     permission_classes = [IsAuthenticated, CoursePermission]
+
+    pagination_class = CourseLessonPaginator  # пагинация
 
     def get_queryset(self):
         """
@@ -65,6 +68,8 @@ class LessonListAPIView(generics.ListAPIView):
 
     # доступно только авторизованным пользователям, модераторам или владельцам
     permission_classes = [IsAuthenticated, IsModerator | IsOwner]
+
+    pagination_class = CourseLessonPaginator  # пагинация
 
 
 class LessonRetrieveAPIView(generics.RetrieveAPIView):
