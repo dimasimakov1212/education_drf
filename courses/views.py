@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework import viewsets, generics
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from courses.models import Course, Lesson, Subscription
 from courses.paginators import CourseLessonPaginator
@@ -18,6 +18,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     # доступно только авторизованным пользователям и с определенными правами
     permission_classes = [IsAuthenticated, CoursePermission]
+    # permission_classes = [AllowAny]
 
     pagination_class = CourseLessonPaginator  # пагинация
 
@@ -49,6 +50,7 @@ class LessonCreateAPIView(generics.CreateAPIView):
 
     # доступно только авторизованным пользователям и не модераторам
     permission_classes = [IsAuthenticated, IsMember]
+    # permission_classes = [AllowAny]
 
     def perform_create(self, serializer):
         """
