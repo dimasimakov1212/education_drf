@@ -2,9 +2,9 @@ from django.shortcuts import render
 from rest_framework import viewsets, generics
 from rest_framework.permissions import IsAuthenticated
 
-from courses.models import Course, Lesson
+from courses.models import Course, Lesson, Subscription
 from courses.permissions import IsMember, IsModerator, IsOwner, CoursePermission
-from courses.serializers import CourseSerializer, LessonSerializer
+from courses.serializers import CourseSerializer, LessonSerializer, SubscriptionSerializer
 from users.models import UserRoles
 
 
@@ -97,3 +97,32 @@ class LessonDestroyAPIView(generics.DestroyAPIView):
 
     # доступно только авторизованным владельцам
     permission_classes = [IsAuthenticated, IsOwner]
+
+
+class SubscriptionCreateAPIView(generics.CreateAPIView):
+    """
+    класс для создания подписки
+    """
+    serializer_class = SubscriptionSerializer
+
+    # доступно только авторизованным пользователям
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        """
+        Определяем порядок создания нового объекта
+        """
+        new_subscription = serializer.save()
+        new_subscription.user = self.request.user  # задаем подписчика
+        new_subscription.save()
+
+
+class SubscriptionUpdateAPIView(generics.UpdateAPIView):
+    """
+    класс для изменения подписки
+    """
+    serializer_class = SubscriptionSerializer
+    queryset = Subscription.objects.all()
+
+    # доступно только авторизованным пользователям, модераторам или владельцам
+    permission_classes = [IsAuthenticated, IsModerator | IsOwner]
