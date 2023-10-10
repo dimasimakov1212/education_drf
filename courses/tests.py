@@ -67,25 +67,28 @@ class LessonTestCase(APITestCase):
             Lesson.objects.all().exists()
         )
 
-    # def test_list_car(self):
-    #     """ тестирование списка машин """
-    #
-    #     Car.objects.create(
-    #         car_title='Test_list',
-    #         car_description='Test_list'
-    #     )
-    #
-    #     response = self.client.get(
-    #         '/cars/'
-    #     )
-    #
-    #     self.assertEquals(
-    #         response.status_code,
-    #         status.HTTP_200_OK
-    #     )
-    #
-    #     self.assertEquals(
-    #         response.json(),
-    #         [{'id': 2, 'milage': [], 'car_title': 'Test_list', 'car_description': 'Test_list', 'owner': None}]
-    #     )
-    #
+    def test_list_lesson(self):
+        """ тестирование списка уроков """
+
+        Lesson.objects.create(
+            lesson_title='Test',
+            lesson_description='Test',
+            lesson_video_url='www.youtube.com'
+        )
+
+        response = self.client.get(
+            '/lesson/'
+        )
+
+        self.assertEquals(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+        self.assertEquals(
+            response.json(),
+            {'count': 1, 'next': None, 'previous': None, 'results': [
+                {'id': 1, 'lesson_video_url': 'www.youtube.com', 'lesson_description': 'Test',
+                 'lesson_title': 'Test', 'lesson_avatar': None, 'course': None, 'owner': None}]}
+        )
+
