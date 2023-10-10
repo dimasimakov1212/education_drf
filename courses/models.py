@@ -46,3 +46,16 @@ class Lesson(models.Model):
         verbose_name = 'Урок'  # Настройка для наименования одного объекта
         verbose_name_plural = 'Уроки'  # Настройка для наименования набора объектов
         ordering = ('lesson_title',)  # сортировка по наименованию
+
+
+class Subscription(models.Model):
+    """
+    Модель подписки на курсы
+    """
+
+    VERSION_CHOICES = ((True, 'Подписан'), (False, 'Не подписан'))
+
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name='курс', blank=True, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='пользователь',
+                             blank=True, null=True)
+    is_active = models.BooleanField(choices=VERSION_CHOICES, default=True, verbose_name='Статус подписки')

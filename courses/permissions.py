@@ -76,3 +76,14 @@ class CoursePermission(BasePermission):
 
         else:
             return False
+
+
+class IsSubscriber(BasePermission):
+    """
+    Задаем права подписчиков
+    """
+    def has_object_permission(self, request, view, obj):
+        if request.user == obj.user:
+            return True
+
+        return False

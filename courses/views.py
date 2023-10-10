@@ -1,10 +1,11 @@
 from django.shortcuts import render
 from rest_framework import viewsets, generics
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from courses.models import Course, Lesson
-from courses.permissions import IsMember, IsModerator, IsOwner, CoursePermission
-from courses.serializers import CourseSerializer, LessonSerializer
+from courses.models import Course, Lesson, Subscription
+from courses.paginators import CourseLessonPaginator
+from courses.permissions import IsMember, IsModerator, IsOwner, CoursePermission, IsSubscriber
+from courses.serializers import CourseSerializer, LessonSerializer, SubscriptionSerializer
 from users.models import UserRoles
 
 
@@ -17,6 +18,9 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     # доступно только авторизованным пользователям и с определенными правами
     permission_classes = [IsAuthenticated, CoursePermission]
+    # permission_classes = [AllowAny]
+
+    pagination_class = CourseLessonPaginator  # пагинация
 
     def get_queryset(self):
         """
@@ -46,6 +50,7 @@ class LessonCreateAPIView(generics.CreateAPIView):
 
     # доступно только авторизованным пользователям и не модераторам
     permission_classes = [IsAuthenticated, IsMember]
+    # permission_classes = [AllowAny]
 
     def perform_create(self, serializer):
         """
@@ -65,6 +70,9 @@ class LessonListAPIView(generics.ListAPIView):
 
     # доступно только авторизованным пользователям, модераторам или владельцам
     permission_classes = [IsAuthenticated, IsModerator | IsOwner]
+    # permission_classes = [AllowAny]
+
+    pagination_class = CourseLessonPaginator  # пагинация
 
 
 class LessonRetrieveAPIView(generics.RetrieveAPIView):
@@ -97,3 +105,32 @@ class LessonDestroyAPIView(generics.DestroyAPIView):
 
     # доступно только авторизованным владельцам
     permission_classes = [IsAuthenticated, IsOwner]
+
+
+class SubscriptionCreateAPIView(generics.CreateAPIView):
+    """
+    класс для создания подписки
+    """
+    serializer_class = SubscriptionSerializer
+
+    # доступно только авторизованным пользователям
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        """
+        Определяем порядок создания нового объекта
+        """
+        new_subscription = serializer.save()
+        new_subscription.user = self.request.user  # задаем подписчика
+        new_subscription.save()
+
+
+class SubscriptionUpdateAPIView(generics.UpdateAPIView):
+    """
+    класс для изменения подписки
+    """
+    serializer_class = SubscriptionSerializer
+    queryset = Subscription.objects.all()
+
+    # доступно только авторизованным пользователям, модераторам или владельцам
+    permission_classes = [IsAuthenticated, IsModerator | IsSubscriber]
