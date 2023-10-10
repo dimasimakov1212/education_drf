@@ -111,8 +111,6 @@ class LessonTestCase(APITestCase):
             reverse('courses:lesson_detail', kwargs={'pk': lesson.pk})
         )
 
-        print(response.json())
-
         self.assertEquals(
             response.status_code,
             status.HTTP_200_OK
@@ -123,4 +121,43 @@ class LessonTestCase(APITestCase):
             {'id': 1, 'lesson_video_url': 'www.youtube.com', 'lesson_description': 'Test',
              'lesson_title': 'Test', 'lesson_avatar': None, 'course': None, 'owner': 1}
         )
+
+    def test_change_lesson(self):
+        """ тестирование изменения урока """
+
+        # отправляем запрос на аутентификацию пользователя
+        response = self.client.post('/users/token/', {"user_email": "admin@sky.pro", "password": "dima123"})
+        self.access_token = response.json().get("access")
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.access_token}')
+
+        user = User.objects.get(pk=self.user.pk)
+
+        lesson = Lesson.objects.create(
+            lesson_title='Test',
+            lesson_description='Test',
+            lesson_video_url='www.youtube.com',
+            owner=user
+        )
+
+        data_lesson_change = {
+            'lesson_title': 'Test_1',
+        }
+
+        response = self.client.patch(
+            reverse('courses:lesson_change', kwargs={'pk': lesson.pk}),
+            data=data_lesson_change
+        )
+
+        self.assertEquals(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+        self.assertEquals(
+            response.json(),
+            {'id': 1, 'lesson_video_url': 'www.youtube.com', 'lesson_description': 'Test',
+             'lesson_title': 'Test_1', 'lesson_avatar': None, 'course': None, 'owner': 1}
+        )
+
+
 
