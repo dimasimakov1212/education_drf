@@ -70,6 +70,7 @@ class LessonListAPIView(generics.ListAPIView):
 
     # доступно только авторизованным пользователям, модераторам или владельцам
     permission_classes = [IsAuthenticated, IsModerator | IsOwner]
+    # permission_classes = [AllowAny]
 
     pagination_class = CourseLessonPaginator  # пагинация
 

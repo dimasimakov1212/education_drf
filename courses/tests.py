@@ -1,4 +1,4 @@
-
+from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
 
@@ -47,8 +47,6 @@ class LessonTestCase(APITestCase):
             data=data_lesson
         )
 
-        print(response.json())
-
         # проверяем ответ на создание пользователя
         self.assertEquals(
             response.status_code,
@@ -90,5 +88,39 @@ class LessonTestCase(APITestCase):
             {'count': 1, 'next': None, 'previous': None, 'results': [
                 {'id': 1, 'lesson_video_url': 'www.youtube.com', 'lesson_description': 'Test',
                  'lesson_title': 'Test', 'lesson_avatar': None, 'course': None, 'owner': None}]}
+        )
+
+    def test_detail_lesson(self):
+        """ тестирование деталей урока """
+
+        # отправляем запрос на аутентификацию пользователя
+        response = self.client.post('/users/token/', {"user_email": "admin@sky.pro", "password": "dima123"})
+        self.access_token = response.json().get("access")
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.access_token}')
+
+        user = User.objects.get(pk=self.user.pk)
+
+        lesson = Lesson.objects.create(
+            lesson_title='Test',
+            lesson_description='Test',
+            lesson_video_url='www.youtube.com',
+            owner=user
+        )
+
+        response = self.client.get(
+            reverse('courses:lesson_detail', kwargs={'pk': lesson.pk})
+        )
+
+        print(response.json())
+
+        self.assertEquals(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+        self.assertEquals(
+            response.json(),
+            {'id': 1, 'lesson_video_url': 'www.youtube.com', 'lesson_description': 'Test',
+             'lesson_title': 'Test', 'lesson_avatar': None, 'course': None, 'owner': 1}
         )
 
