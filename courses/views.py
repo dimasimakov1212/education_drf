@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from courses.models import Course, Lesson, Subscription
 from courses.paginators import CourseLessonPaginator
-from courses.permissions import IsMember, IsModerator, IsOwner, CoursePermission
+from courses.permissions import IsMember, IsModerator, IsOwner, CoursePermission, IsSubscriber
 from courses.serializers import CourseSerializer, LessonSerializer, SubscriptionSerializer
 from users.models import UserRoles
 
@@ -133,4 +133,4 @@ class SubscriptionUpdateAPIView(generics.UpdateAPIView):
     queryset = Subscription.objects.all()
 
     # доступно только авторизованным пользователям, модераторам или владельцам
-    permission_classes = [IsAuthenticated, IsModerator | IsOwner]
+    permission_classes = [IsAuthenticated, IsModerator | IsSubscriber]
