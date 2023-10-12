@@ -1,10 +1,15 @@
-from django.shortcuts import render
+import stripe
+from django.http import JsonResponse
+from django.shortcuts import render, get_object_or_404
+from django.views import View
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import generics
+from rest_framework import generics, status
+
 from rest_framework.filters import OrderingFilter
 
-from payment.models import Payment
-from payment.serializers import PaymentSerializer
+from payment.models import Payment, Product, PayStripe
+from payment.serializers import PaymentSerializer, ProductSerializer
+from payment.services import test_payment_create
 
 
 class PaymentListAPIView(generics.ListAPIView):
@@ -47,3 +52,39 @@ class PaymentDestroyAPIView(generics.DestroyAPIView):
     класс для удаления одного мото на основе generics
     """
     queryset = Payment.objects.all()
+
+
+class ProductCreateAPIView(generics.CreateAPIView):
+    """
+    класс для создания продукта для оплаты
+    """
+    serializer_class = ProductSerializer
+
+
+class ProductListAPIView(generics.ListAPIView):
+    """
+    класс для вывода списка продуктов
+    """
+    serializer_class = ProductSerializer
+    queryset = Product.objects.all()
+
+
+def pay_stripe_create():
+
+    """
+    класс для создания оплаты товара
+    """
+
+    # product = get_object_or_404(Product, pk=self.kwargs['pk'])
+    product = Product.objects.get(id=1)
+
+    amount = product.product_price
+
+    pay_create = test_payment_create(amount)
+
+    # PayStripe.objects.create(
+    #     stripe_id=pay_create.id,
+    #     product=product,
+    # )
+
+    return pay_create

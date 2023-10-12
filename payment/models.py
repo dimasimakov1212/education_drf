@@ -34,3 +34,26 @@ class Payment(models.Model):
         verbose_name = 'Платеж'  # Настройка для наименования одного объекта
         verbose_name_plural = 'Платежи'  # Настройка для наименования набора объектов
         ordering = ('payment_date',)  # сортировка
+
+
+class Product(models.Model):
+    """
+    Модель продукта для оплаты
+    """
+    product_name = models.CharField(max_length=100, verbose_name='продукт')
+    product_price = models.IntegerField(default=0, verbose_name='цена')  # cents
+
+    def __str__(self):
+        return self.product_name
+
+    def get_display_price(self):
+        return "{0:.2f}".format(self.product_price / 100)
+
+
+class PayStripe(models.Model):
+    """
+    Модель для создания платежа в системе Stripe
+    """
+    stripe_id = models.CharField(max_length=255, unique=True, editable=False, verbose_name='id')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='продукт')
+    customer_email = models.EmailField(null=True, blank=True, verbose_name='почта')
