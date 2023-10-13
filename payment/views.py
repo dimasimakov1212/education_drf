@@ -9,7 +9,6 @@ from rest_framework.filters import OrderingFilter
 
 from payment.models import Payment, Product, PayStripe
 from payment.serializers import PaymentSerializer, ProductSerializer
-from payment.services import test_payment_create
 
 
 class PaymentListAPIView(generics.ListAPIView):
@@ -69,22 +68,38 @@ class ProductListAPIView(generics.ListAPIView):
     queryset = Product.objects.all()
 
 
-def pay_stripe_create():
-
+class ProductRetrieveAPIView(generics.RetrieveAPIView):
     """
-    класс для создания оплаты товара
+    класс для вывода одного платежа на основе generics
     """
+    serializer_class = ProductSerializer
+    queryset = Product.objects.all()
 
-    # product = get_object_or_404(Product, pk=self.kwargs['pk'])
-    product = Product.objects.get(id=1)
 
-    amount = product.product_price
+class ProductDestroyAPIView(generics.DestroyAPIView):
+    """
+    класс для удаления одного мото на основе generics
+    """
+    serializer_class = ProductSerializer
+    queryset = Product.objects.all()
 
-    pay_create = test_payment_create(amount)
 
-    # PayStripe.objects.create(
-    #     stripe_id=pay_create.id,
-    #     product=product,
-    # )
-
-    return pay_create
+# def pay_stripe_create():
+#
+#     """
+#     класс для создания оплаты товара
+#     """
+#
+#     # product = get_object_or_404(Product, pk=self.kwargs['pk'])
+#     product = Product.objects.get(id=1)
+#
+#     amount = product.product_price
+#
+#     pay_create = test_payment_create(amount)
+#
+#     # PayStripe.objects.create(
+#     #     stripe_id=pay_create.id,
+#     #     product=product,
+#     # )
+#
+#     return pay_create

@@ -41,19 +41,38 @@ class Product(models.Model):
     Модель продукта для оплаты
     """
     product_name = models.CharField(max_length=100, verbose_name='продукт')
+    stripe_name_id = models.CharField(max_length=100, null=True, blank=True, verbose_name='id продукта')
     product_price = models.IntegerField(default=0, verbose_name='цена')  # cents
+    stripe_price_id = models.CharField(max_length=100, null=True, blank=True, verbose_name='id цены')
 
     def __str__(self):
         return self.product_name
 
-    def get_display_price(self):
-        return "{0:.2f}".format(self.product_price / 100)
+    class Meta:
+        verbose_name = 'продукт'  # Настройка для наименования одного объекта
+        verbose_name_plural = 'продукты'  # Настройка для наименования набора объектов
+        ordering = ('id',)  # сортировка
+
+    # def get_display_price(self):
+    #     return "{0:.2f}".format(self.product_price / 100)
 
 
 class PayStripe(models.Model):
     """
     Модель для создания платежа в системе Stripe
     """
-    stripe_id = models.CharField(max_length=255, unique=True, editable=False, verbose_name='id')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='продукт')
+    stripe_payment_link_id = models.CharField(max_length=255, unique=True, editable=False,
+                                              verbose_name='id ссылки на платеж', blank=True, null=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='продукт', blank=True, null=True)
+    stripe_payment_link = models.URLField(verbose_name='Ссылка на платеж', blank=True, null=True)
+    stripe_payment_id = models.CharField(max_length=255, unique=True, editable=False,
+                                         verbose_name='id платежа', blank=True, null=True)
     customer_email = models.EmailField(null=True, blank=True, verbose_name='почта')
+
+    def __str__(self):
+        return self.id
+
+    class Meta:
+        verbose_name = 'платеж stripe'  # Настройка для наименования одного объекта
+        verbose_name_plural = 'платежи stripe'  # Настройка для наименования набора объектов
+        ordering = ('id',)  # сортировка

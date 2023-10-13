@@ -4,9 +4,10 @@ from payment import services
 from payment.apps import PaymentConfig
 from rest_framework.routers import DefaultRouter
 
-from payment.services import test_payment_create, test_payment_detail
+from payment.services import stripe_product_create, stripe_price_create, stripe_pay_url_create, \
+    stripe_payment_intent_create, stripe_payment_intent_detail
 from payment.views import PaymentListAPIView, PaymentCreateAPIView, PaymentUpdateAPIView, PaymentRetrieveAPIView, \
-    PaymentDestroyAPIView, ProductCreateAPIView, ProductListAPIView
+    PaymentDestroyAPIView, ProductCreateAPIView, ProductListAPIView, ProductDestroyAPIView, ProductRetrieveAPIView
 
 app_name = PaymentConfig.name
 
@@ -21,6 +22,12 @@ urlpatterns = [
 
     path('product_create/', ProductCreateAPIView.as_view(), name='product_create'),
     path('product_list/', ProductListAPIView.as_view(), name='product_list'),
-    path('pay_create/', test_payment_create, name='pay_create'),
-    path('payment_detail/', test_payment_detail, name='payment_detail'),
+    path('product_detail/<int:pk>/', ProductRetrieveAPIView.as_view(), name='product_detail'),
+    path('product_delete/<int:pk>/', ProductDestroyAPIView.as_view(), name='product_delete'),
+
+    path('stripe_product_create/', stripe_product_create, name='stripe_product_create'),
+    path('stripe_price_create/', stripe_price_create, name='stripe_price_create'),
+    path('stripe_pay_url_create/', stripe_pay_url_create, name='stripe_pay_url_create'),
+    path('stripe_payment_intent_create/', stripe_payment_intent_create, name='stripe_payment_intent_create'),
+    path('stripe_payment_intent_detail/', stripe_payment_intent_detail, name='stripe_payment_intent_detail'),
     ] + router.urls
