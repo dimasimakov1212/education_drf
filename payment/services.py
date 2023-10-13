@@ -19,41 +19,97 @@ card_visa_date = '10/25'
 
 
 @api_view(['POST'])
-def test_payment_create(request):
+def stripe_product_create(request):
 
-    product = Product.objects.last()
+    product = Product.objects.get(id=1)
+    print(product.product_name)
 
-    payment_intent = stripe.PaymentIntent.create(
-        amount=product.product_price,
-        currency='USD',
-        payment_method_types=['card'],
-        receipt_email='test@example.com')
+    payment_product = stripe.Product.create(
+        name=product.product_name
+    )
 
-    a = JsonResponse({
-        'id': payment_intent.id
-    })
-    response = Response(status=status.HTTP_200_OK, data=payment_intent)
+    response = Response(status=status.HTTP_200_OK, data=payment_product)
+
+    product.stripe_name_id = payment_product.id
+    product.save()
+
+    return response
+
+
+@api_view(['POST'])
+def stripe_price_create(request):
+
+    product = Product.objects.get(id=1)
+
+    payment_price = stripe.Price.create(
+        unit_amount=product.product_price,
+        currency="usd",
+        product=product.stripe_name_id,
+    )
+
+    response = Response(status=status.HTTP_200_OK, data=payment_price)
+
+    product.stripe_price_id = payment_price.id
+    product.save()
+
+    return response
+
+
+@api_view(['POST'])
+def stripe_pay_url_create(request):
+
+    product = Product.objects.get(id=1)
+
+    payment_url = stripe.PaymentLink.create(
+        line_items=[
+            {
+                "price": product.stripe_price_id,
+                "quantity": 1,
+            },
+        ],
+    )
+
+    response = Response(status=status.HTTP_200_OK, data=payment_url)
 
     PayStripe.objects.create(
-        stripe_id=payment_intent.id,
+        stripe_payment_link_id=payment_url.id,
         product=product,
+        stripe_payment_link=payment_url.url
+    )
+
+    return response
+
+
+@api_view(['POST'])
+def stripe_payment_intent_create(request):
+
+    product = Product.objects.get(id=1)
+
+    stripe_payment = stripe.PaymentIntent.create(
+        amount=product.product_price,
+        currency="usd",
+        payment_method_types=['card'],
+    )
+
+    response = Response(status=status.HTTP_200_OK, data=stripe_payment)
+
+    PayStripe.objects.create(
+        product=product,
+        stripe_payment_id=stripe_payment.id
     )
 
     return response
 
 
 @api_view(['GET'])
-def test_payment_detail(request):
+def stripe_payment_intent_detail(request):
 
-    pay_stripe = PayStripe.objects.last()
+    payment = PayStripe.objects.get(id=3)
 
     payment_detail = stripe.PaymentIntent.retrieve(
-        id=pay_stripe.stripe_id
-        )
+        payment.stripe_payment_id
+    )
 
-    # a = JsonResponse({
-    #     'id': test_payment_intent.id
-    # })
     response = Response(status=status.HTTP_200_OK, data=payment_detail)
 
     return response
