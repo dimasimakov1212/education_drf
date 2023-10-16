@@ -7,6 +7,7 @@ from courses.paginators import CourseLessonPaginator
 from courses.permissions import IsMember, IsModerator, IsOwner, CoursePermission, IsSubscriber
 from courses.serializers import CourseSerializer, LessonSerializer, SubscriptionSerializer
 from users.models import UserRoles
+from courses.tasks import subscriber_notice
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -59,6 +60,8 @@ class LessonCreateAPIView(generics.CreateAPIView):
         new_lesson = serializer.save()
         new_lesson.owner = self.request.user  # задаем владельца урока
         new_lesson.save()
+
+        subscriber_notice.delay(new_lesson.course_id)
 
 
 class LessonListAPIView(generics.ListAPIView):
@@ -123,6 +126,18 @@ class SubscriptionCreateAPIView(generics.CreateAPIView):
         new_subscription = serializer.save()
         new_subscription.user = self.request.user  # задаем подписчика
         new_subscription.save()
+
+
+class SubscriptionListAPIView(generics.ListAPIView):
+    """
+    класс для вывода списка подписок
+    """
+    serializer_class = SubscriptionSerializer
+    queryset = Subscription.objects.all()
+
+    # доступно только авторизованным пользователям, модераторам или владельцам
+    # permission_classes = [IsAuthenticated, IsModerator | IsOwner]
+    permission_classes = [AllowAny]
 
 
 class SubscriptionUpdateAPIView(generics.UpdateAPIView):
