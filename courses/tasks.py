@@ -9,15 +9,13 @@ def subscriber_notice(course_id):
     Уведомление подписчиков об изменениях курса
     """
 
-    course = Course.objects.filter(pk=course_id)
+    course = Course.objects.get(pk=course_id)  # получаем данные об измененном курсе
 
-    subscriptions = Subscription.objects.filter(course=course_id)
+    subscriptions = Subscription.objects.filter(course=course_id)  # получаем подписки на данный курс
 
-    for a in subscriptions:
-        print(a.user)
+    # если подписки существуют, отправляем подписчикам курса сообщение об изменениях
+    if subscriptions:
+        for subscription in subscriptions:
 
-    # if instance:
-    #
-    #     for subscription in instance.subscription.all():
-    #         if subscription:
-    #             print(f'Привет {subscription.user}! В курсе {instance.course_title} произошли изменения')
+            print(f'Привет, {subscription.user}! В курсе "{course.course_title}" произошли изменения. '
+                  f'Заходи узнать что-нибудь новое для себя')

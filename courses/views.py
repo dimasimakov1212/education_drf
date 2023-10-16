@@ -61,6 +61,7 @@ class LessonCreateAPIView(generics.CreateAPIView):
         new_lesson.owner = self.request.user  # задаем владельца урока
         new_lesson.save()
 
+        # запускаем отложенную задачу по информированию подписчиков курса о добалении нового урока
         subscriber_notice.delay(new_lesson.course_id)
 
 
@@ -98,6 +99,16 @@ class LessonUpdateAPIView(generics.UpdateAPIView):
 
     # доступно только авторизованным пользователям, модераторам или владельцам
     permission_classes = [IsAuthenticated, IsModerator | IsOwner]
+
+    def perform_update(self, serializer):
+        """
+        Определяем порядок изменения урока
+        """
+        changed_lesson = serializer.save()
+        changed_lesson.save()
+
+        # запускаем отложенную задачу по информированию подписчиков курса о изменениях уроков курса
+        subscriber_notice.delay(changed_lesson.course_id)
 
 
 class LessonDestroyAPIView(generics.DestroyAPIView):
