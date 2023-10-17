@@ -1,12 +1,14 @@
 from django.shortcuts import render
 from rest_framework import viewsets, generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.response import Response
 
 from courses.models import Course, Lesson, Subscription
 from courses.paginators import CourseLessonPaginator
 from courses.permissions import IsMember, IsModerator, IsOwner, CoursePermission, IsSubscriber
 from courses.serializers import CourseSerializer, LessonSerializer, SubscriptionSerializer
 from users.models import UserRoles
+from courses.tasks import subscriber_notice
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -60,6 +62,9 @@ class LessonCreateAPIView(generics.CreateAPIView):
         new_lesson.owner = self.request.user  # задаем владельца урока
         new_lesson.save()
 
+        # запускаем отложенную задачу по информированию подписчиков курса о добалении нового урока
+        subscriber_notice.delay(new_lesson.course_id)
+
 
 class LessonListAPIView(generics.ListAPIView):
     """
@@ -96,6 +101,16 @@ class LessonUpdateAPIView(generics.UpdateAPIView):
     # доступно только авторизованным пользователям, модераторам или владельцам
     permission_classes = [IsAuthenticated, IsModerator | IsOwner]
 
+    def perform_update(self, serializer):
+        """
+        Определяем порядок изменения урока
+        """
+        changed_lesson = serializer.save()
+        changed_lesson.save()
+
+        # запускаем отложенную задачу по информированию подписчиков курса о изменениях уроков курса
+        subscriber_notice.delay(changed_lesson.course_id)
+
 
 class LessonDestroyAPIView(generics.DestroyAPIView):
     """
@@ -123,6 +138,18 @@ class SubscriptionCreateAPIView(generics.CreateAPIView):
         new_subscription = serializer.save()
         new_subscription.user = self.request.user  # задаем подписчика
         new_subscription.save()
+
+
+class SubscriptionListAPIView(generics.ListAPIView):
+    """
+    класс для вывода списка подписок
+    """
+    serializer_class = SubscriptionSerializer
+    queryset = Subscription.objects.all()
+
+    # доступно только авторизованным пользователям, модераторам или владельцам
+    # permission_classes = [IsAuthenticated, IsModerator | IsOwner]
+    permission_classes = [AllowAny]
 
 
 class SubscriptionUpdateAPIView(generics.UpdateAPIView):

@@ -28,7 +28,8 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Subscription
-        fields = ('course', 'is_active',)
+        # fields = ('course', 'is_active',)
+        fields = '__all__'
 
 
 class CourseSerializer(serializers.ModelSerializer):
