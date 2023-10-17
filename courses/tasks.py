@@ -1,6 +1,7 @@
 from celery import shared_task
 
 from courses.models import Course, Subscription
+from users.models import User
 
 
 @shared_task

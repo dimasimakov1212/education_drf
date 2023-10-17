@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets, generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.response import Response
 
 from courses.models import Course, Lesson, Subscription
 from courses.paginators import CourseLessonPaginator
