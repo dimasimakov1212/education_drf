@@ -31,6 +31,8 @@ class Lesson(models.Model):
     lesson_description = models.TextField(verbose_name='описание')
     lesson_avatar = models.ImageField(upload_to='media/', verbose_name='аватар', blank=True, null=True)
     lesson_video_url = models.URLField(verbose_name='Ссылка на видео', blank=True, null=True)
+    lesson_datetime_changing = models.DateTimeField(blank=True, null=True,
+                                                    verbose_name='Дата и время последнего изменения')
 
     course = models.ForeignKey(Course, on_delete=models.CASCADE, verbose_name='курс', blank=True, null=True,
                                related_name='lesson')

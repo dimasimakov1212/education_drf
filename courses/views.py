@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from rest_framework import viewsets, generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.response import Response
+from datetime import datetime, timedelta
+import pytz
 
 from courses.models import Course, Lesson, Subscription
 from courses.paginators import CourseLessonPaginator
@@ -60,6 +61,7 @@ class LessonCreateAPIView(generics.CreateAPIView):
         """
         new_lesson = serializer.save()
         new_lesson.owner = self.request.user  # задаем владельца урока
+        new_lesson.lesson_datetime_changing = datetime.now()  # заносим текущие дату и время в последние изменения урока
         new_lesson.save()
 
         # запускаем отложенную задачу по информированию подписчиков курса о добалении нового урока
@@ -106,10 +108,24 @@ class LessonUpdateAPIView(generics.UpdateAPIView):
         Определяем порядок изменения урока
         """
         changed_lesson = serializer.save()
-        changed_lesson.save()
+        date_time_now = datetime.now()  # получаем текущие дату и время
+        moscow_timezone = pytz.timezone('Europe/Moscow')  # устанавливаем часовой пояс
+        date_now = date_time_now.astimezone(moscow_timezone)  # устанавливаем текущую дату с учетом часового пояса
 
-        # запускаем отложенную задачу по информированию подписчиков курса о изменениях уроков курса
-        subscriber_notice.delay(changed_lesson.course_id)
+        # если дата последнего изменения урока существует, проверяем условие запуска отложенной задачи
+        if changed_lesson.lesson_datetime_changing:
+
+            # устанавливаем дату последнего изменения урока с учетом часового пояса
+            lesson_last_change_date = changed_lesson.lesson_datetime_changing.astimezone(moscow_timezone)
+
+            # если текущее время больше времени последнего изменения урока на количество часов
+            if abs(date_now - lesson_last_change_date) > timedelta(hours=4):
+                # запускаем отложенную задачу по информированию подписчиков курса о изменениях уроков курса
+                subscriber_notice.delay(changed_lesson.course_id)
+
+        # заносим текущие дату и время в последние изменения урока
+        changed_lesson.lesson_datetime_changing = date_now
+        changed_lesson.save()
 
 
 class LessonDestroyAPIView(generics.DestroyAPIView):
