@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-lh_j+4mrix%z&zzjq6%l-%s1-#=68b76oz#rs(3=b6sq-1s(wj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -100,7 +100,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'education_drf',
+        'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'mysecretpassword',
         'HOST': 'db'
@@ -184,5 +184,10 @@ CORS_ALLOW_ALL_ORIGINS = False
 STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 
-CELERY_BROKER_URL = "redis://localhost:6379"
-CELERY_RESULT_BACKEND = "redis://localhost:6379"
+# CELERY_BROKER_URL = "redis://localhost:6379"
+# CELERY_RESULT_BACKEND = "redis://localhost:6379"
+
+CELERY_BROKER_URL = "redis://redis:6379"
+CELERY_RESULT_BACKEND = "redis://redis:6379"
+
+BROKER_CONNECTION_RETRY_ON_STARTUP = True
