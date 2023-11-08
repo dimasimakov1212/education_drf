@@ -102,7 +102,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD': 'mysecretpassword',
+        'PASSWORD': 'mysecretpassword',  # пароль, созданный при запуске контейнера postgres
         'HOST': 'db'
     }
 }
