@@ -38,5 +38,14 @@ swagger и redoc
 и запускать на любой совместимой с Docker системе.
 
 Запустить проект на докере команды в терминале.
-docker-compose build - собрать проект,
-docker-compose up - запустить проект
+
+**собрать проект**
+```commandline
+docker compose build
+```
+
+**запустить проект**
+```commandline
+   docker-compose build
+```
+
