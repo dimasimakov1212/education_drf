@@ -46,6 +46,6 @@ docker compose build
 
 **запустить проект**
 ```commandline
-   docker-compose build
+docker-compose build
 ```
 
