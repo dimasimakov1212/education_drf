@@ -39,7 +39,13 @@ swagger и redoc
 
 Запустить проект на докере команды в терминале.
 
-...
-docker compose build - собрать проект,
-docker-compose up - запустить проект
-...
+**собрать проект**
+    ```
+    docker compose build
+    ```
+
+**запустить проект**
+    ```
+    docker-compose up
+    ```
+
