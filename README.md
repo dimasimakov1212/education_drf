@@ -40,9 +40,9 @@ swagger и redoc
 Запустить проект на докере команды в терминале.
 
 **собрать проект**
-    ```commandline
-    docker compose build
-    ```
+```commandline
+docker compose build
+```
 
 **запустить проект**
 ```commandline
